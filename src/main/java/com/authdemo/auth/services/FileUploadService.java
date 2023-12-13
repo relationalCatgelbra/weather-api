@@ -28,12 +28,12 @@ import com.opencsv.exceptions.CsvValidationException;
 @Service
 public class FileUploadService {
 
-    private WeatherResponseDataService weatherResponseDataService;
+    private WeatherResponseDataRepositoryService weatherResponseDataRepositoryService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public FileUploadService(WeatherResponseDataService weatherResponseDataService) {
-        this.weatherResponseDataService = weatherResponseDataService;
+    public FileUploadService(WeatherResponseDataRepositoryService weatherResponseDataRepositoryService) {
+        this.weatherResponseDataRepositoryService = weatherResponseDataRepositoryService;
 
     }
 
@@ -48,13 +48,14 @@ public class FileUploadService {
         weatherResponseDataList
                 .stream()
                 .forEach(
-                        weatherResponseData -> weatherResponseDataService.saveWeatherResponseData(weatherResponseData));
+                        weatherResponseData -> weatherResponseDataRepositoryService
+                                .saveWeatherResponseData(weatherResponseData));
 
         return weatherResponseDataList;
 
     }
 
-    public List<WeatherResponseData> uploadCSVFile(MultipartFile file) throws IOException, CsvValidationException {
+    public List<WeatherResponseData> uploadCsvFile(MultipartFile file) throws IOException, CsvValidationException {
 
         List<WeatherResponseData> weatherResponseDataList = new ArrayList<>();
 
@@ -113,7 +114,7 @@ public class FileUploadService {
                 }
 
             }
-            weatherResponseDataService.saveWeatherResponseData(weatherResponseData);
+            weatherResponseDataRepositoryService.saveWeatherResponseData(weatherResponseData);
             weatherResponseDataList.add(weatherResponseData);
 
         }
@@ -177,7 +178,7 @@ public class FileUploadService {
             weatherResponseData.setDate(date);
             weatherResponseData.setTime(time);
 
-            weatherResponseDataService.saveWeatherResponseData(weatherResponseData);
+            weatherResponseDataRepositoryService.saveWeatherResponseData(weatherResponseData);
 
             weatherResponseDataList.add(weatherResponseData);
 

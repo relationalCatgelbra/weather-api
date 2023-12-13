@@ -3,32 +3,37 @@ package com.authdemo.auth.services;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import com.authdemo.auth.models.Location;
+import com.authdemo.auth.models.LocationRequest;
+import com.authdemo.auth.models.WeatherApiResponse;
 import com.authdemo.auth.models.WeatherData;
 import com.authdemo.auth.models.WeatherResponseData;
-import com.authdemo.auth.repositories.WeatherResponseDataRepository;
 
 @Service
 public class WeatherResponseDataService {
 
-    private WeatherResponseDataRepository weatherResponseRepository;
+    private WeatherResponseDataRepositoryService weatherResponseRepositoryService;
 
-    public WeatherResponseDataService(WeatherResponseDataRepository weatherResponseDataRepository) {
-        this.weatherResponseRepository = weatherResponseDataRepository;
-    }
+    private TokenClass tokenClass;
 
-    public WeatherResponseData saveWeatherResponseData(WeatherResponseData weatherResponseData) {
-        return weatherResponseRepository.save(weatherResponseData);
-    }
+    private CoordinatesService coordinatesService;
 
-    public List<WeatherResponseData> getAllWeatherDataByCountryAndCity(String countryName, String cityName) {
-        return weatherResponseRepository.findByCountryAndCity(countryName, cityName);
-
+    public WeatherResponseDataService(
+            WeatherResponseDataRepositoryService weatherResponseDataRepositoryService,
+            TokenClass tokenClass,
+            CoordinatesService coordinatesService) {
+        this.weatherResponseRepositoryService = weatherResponseDataRepositoryService;
+        this.tokenClass = tokenClass;
+        this.coordinatesService = coordinatesService;
     }
 
     public WeatherResponseData toWeatherResponseDataObject(List<WeatherData> weatherData, String country, String city) {
@@ -115,6 +120,53 @@ public class WeatherResponseDataService {
 
     public String getWeatherApiBaseUrl() {
         return "https://api.meteomatics.com";
+    }
+
+    public WeatherResponseData getCurrentWeatherData(LocationRequest locationRequest) throws NullPointerException {
+
+        String weatherApiBaseUrl = getWeatherApiBaseUrl();
+
+        String tokenString = tokenClass.getToken();
+
+        Location location = coordinatesService
+                .getCoordinatesByCityAndCountry(locationRequest.getCity(),
+                        locationRequest.getCountry(), locationRequest.getFormat());
+
+        String coordinates = String.join(",", location.getLon(), location.getLat());
+
+        String localDate = getLocalDate();
+
+        String uriString = UriComponentsBuilder.fromUriString(weatherApiBaseUrl)
+                .pathSegment(localDate)
+                .pathSegment(getWeatherApiParameters())
+                .pathSegment(coordinates)
+                .pathSegment("json")
+                .build()
+                .toUriString();
+
+        List<WeatherData> weatherResponse = WebClient.create(uriString)
+                .get()
+                .uri("?access_token={token}", tokenString)
+                .retrieve()
+                .bodyToMono(WeatherApiResponse.class)
+                .block()
+                .getData();
+
+        WeatherResponseData weatherResponseData = toWeatherResponseDataObject(
+                weatherResponse, locationRequest.getCountry(), locationRequest.getCity());
+
+        return weatherResponseRepositoryService
+                .saveWeatherResponseData(weatherResponseData);
+
+    }
+
+    private String getLocalDate() {
+        ZoneOffset zoneOffset = ZoneOffset.ofHours(-5);
+        LocalDateTime localDateTime = LocalDateTime.now().withNano(0);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+
+        return localDateTime.atOffset(zoneOffset).format(formatter);
+
     }
 
 }
