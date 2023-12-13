@@ -1,0 +1,19 @@
+{
+    "properties": [
+        {
+            "name": "meteomatics.api.password",
+            "type": "java.lang.String",
+            "description": "A description for 'meteomatics.api.password'"
+        },
+        {
+            "name": "meteomatics.api.username",
+            "type": "java.lang.String",
+            "description": "A description for 'meteomatics.api.username'"
+        },
+        {
+            "name": "meteomatics.api.url",
+            "type": "java.lang.String",
+            "description": "A description for 'meteomatics.api.url'"
+        }
+    ]
+}
