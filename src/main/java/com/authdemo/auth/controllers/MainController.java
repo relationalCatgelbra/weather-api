@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.authdemo.auth.models.LocationRequest;
 import com.authdemo.auth.models.WeatherResponseData;
+import com.authdemo.auth.models.requestmodels.LocationRequest;
 import com.authdemo.auth.services.WeatherResponseDataService;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -23,7 +25,7 @@ public class MainController {
 
         @PostMapping("/currentdata")
         public ResponseEntity<WeatherResponseData> getLocation(
-                        @RequestBody LocationRequest locationRequest) {
+                        @Valid @RequestBody LocationRequest locationRequest) {
 
                 return ResponseEntity
                                 .status(HttpStatus.OK)

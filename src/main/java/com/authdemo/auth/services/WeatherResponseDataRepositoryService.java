@@ -1,9 +1,9 @@
 package com.authdemo.auth.services;
 
+import java.util.List;
+
 import com.authdemo.auth.models.WeatherResponseData;
 import com.authdemo.auth.repositories.WeatherResponseDataRepository;
-
-import java.util.List;
 
 public class WeatherResponseDataRepositoryService {
 
@@ -20,6 +20,10 @@ public class WeatherResponseDataRepositoryService {
     public List<WeatherResponseData> getAllWeatherDataByCountryAndCity(String countryName, String cityName) {
         return weatherResponseRepository.findByCountryAndCity(countryName, cityName);
 
+    }
+
+    public List<WeatherResponseData> getAllData() {
+        return weatherResponseRepository.findAll();
     }
 
 }

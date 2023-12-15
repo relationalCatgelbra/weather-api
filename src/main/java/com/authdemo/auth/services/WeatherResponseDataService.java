@@ -13,10 +13,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.authdemo.auth.models.Location;
-import com.authdemo.auth.models.LocationRequest;
 import com.authdemo.auth.models.WeatherApiResponse;
 import com.authdemo.auth.models.WeatherData;
 import com.authdemo.auth.models.WeatherResponseData;
+import com.authdemo.auth.models.requestmodels.LocationRequest;
 
 @Service
 public class WeatherResponseDataService {

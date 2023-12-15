@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.authdemo.auth.models.HistoricalDataRequestObject;
 import com.authdemo.auth.models.WeatherResponseData;
 import com.authdemo.auth.models.WeatherResponseDataHistorical;
 import com.authdemo.auth.models.WeatherResponseDataOperations;
+import com.authdemo.auth.models.requestmodels.HistoricalDataRequestObject;
 
 @Service
 public class HistoricalDataService {
@@ -67,6 +67,10 @@ public class HistoricalDataService {
 
                 return weatherResponseDataHistorical;
 
+        }
+
+        public List<WeatherResponseData> getAllWeatherData() {
+                return weatherResponseDataRepositoryService.getAllData();
         }
 
 }
